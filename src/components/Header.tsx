@@ -76,14 +76,7 @@ useEffect(() => {
 
   return (
     <>
-      {/* <div className="w-ful">
-        <img
-          src="https://api.oyonews.com.ng/wp-content/uploads/2026/02/20ef5e07-adc2-4a5c-8942-c5cf925161b9.jpeg"
-          alt="Top Banner"
-          className="w-full h-auto object-cover"
-          loading="lazy"
-        />
-      </div> */}
+    
 
       {/* 🔴 Header Section */}
       <header className="bg-black text-white sticky top-0 z-50">
