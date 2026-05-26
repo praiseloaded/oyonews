@@ -59,6 +59,7 @@ useEffect(() => {
   fetchLogo();
 }, []);
 
+
   if (isLoading) {
     return (
       <>
