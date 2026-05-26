@@ -117,7 +117,7 @@ useEffect(() => {
                     <div className="text-white font-bold text-sm">ON</div>
                   </div>
                 )}
-                <span className="text-xl font-bold text-red-400">OYONEWS</span>
+                <span className="text-xl font-bold text-red-400">OYO</span>
               </Link>
             </div>
 
