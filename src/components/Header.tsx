@@ -30,18 +30,34 @@ const Header = () => {
       .join('')
       .toUpperCase();
 
-  useEffect(() => {
-    const fetchLogo = async () => {
-      try {
-        const res = await fetch('https://api.oyonews.com.ng/wp-json');
-        const data = await res.json();
-        if (data?.site_icon_url) setLogoUrl(data.site_icon_url);
-      } catch (error) {
-        console.error('Error fetching site logo:', error);
+useEffect(() => {
+  const fetchLogo = async () => {
+    try {
+      const res = await fetch('https://api.oyonews.com.ng/wp-json', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
       }
-    };
-    fetchLogo();
-  }, []);
+
+      const data = await res.json();
+
+      const icon =
+        data?.site_icon_url ||
+        data?.icon ||
+        null;
+
+      if (icon) setLogoUrl(icon);
+    } catch (error) {
+      console.error('Logo fetch failed:', error);
+      setLogoUrl('/logo-fallback.png');
+    }
+  };
+
+  fetchLogo();
+}, []);
 
   if (isLoading) {
     return (
@@ -59,14 +75,14 @@ const Header = () => {
 
   return (
     <>
-      <div className="w-ful">
+      {/* <div className="w-ful">
         <img
           src="https://api.oyonews.com.ng/wp-content/uploads/2026/02/20ef5e07-adc2-4a5c-8942-c5cf925161b9.jpeg"
           alt="Top Banner"
           className="w-full h-auto object-cover"
           loading="lazy"
         />
-      </div>
+      </div> */}
 
       {/* 🔴 Header Section */}
       <header className="bg-black text-white sticky top-0 z-50">
