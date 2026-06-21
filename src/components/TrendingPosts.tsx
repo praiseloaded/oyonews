@@ -68,7 +68,7 @@ const TrendingPosts = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          "https://api.oyonews.com.ng/wp-json/wp/v2/posts?per_page=5&orderby=post_views_count&order=desc&meta_key=post_views_count&_embed"
+          "/api/posts?per_page=5&orderby=post_views_count&order=desc&meta_key=post_views_count&_embed"
         );
         if (!res.ok) throw new Error("Failed to fetch trending posts");
 

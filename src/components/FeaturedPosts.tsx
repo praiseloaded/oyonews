@@ -53,7 +53,7 @@ const FeaturedPosts = () => {
 
       try {
         const res = await fetch(
-          "https://api.oyonews.com.ng/wp-json/wp/v2/posts?per_page=5&orderby=date&order=desc&_embed"
+"/api/posts?per_page=5&orderby=date&order=desc&_embed"
         );
 
         console.log("Fetching posts...");

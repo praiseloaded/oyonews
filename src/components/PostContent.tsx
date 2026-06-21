@@ -4,10 +4,8 @@ import AdBanner from "@/components/AdBanner";
 import ShareButtons from "@/components/ShareButtons";
 import ViewCounter from "@/components/ViewCounter";
 import CommentsSection from "@/components/CommentSection";
-import * as cheerio from "cheerio";
 import Link from "next/link";
 import { format } from "date-fns";
-
 
 type Post = {
   id: number;
@@ -39,23 +37,6 @@ type Props = {
   relatedPosts: RelatedPost[];
 };
 
-const injectAdsIntoContent = (html: string): string[] => {
-  const $ = cheerio.load(html);
-  const elements = $("body").children().toArray();
-  const parts: string[] = [];
-
-  const interval = Math.floor(elements.length / 3) || 2;
-
-  elements.forEach((el, i) => {
-    parts.push($.html(el));
-    if (i > 0 && i % interval === 0) {
-      parts.push("__AD_PLACEHOLDER__");
-    }
-  });
-
-  return parts;
-};
-
 export default function PostContent({ post, relatedPosts }: Props) {
   const featuredImage =
     post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
@@ -67,20 +48,19 @@ export default function PostContent({ post, relatedPosts }: Props) {
   const tags =
     post._embedded?.["wp:term"]?.[1]?.map((tag: { name: string }) => tag.name) || [];
 
-const date = format(new Date(post.date), "MMMM d, yyyy"); 
+  const date = format(new Date(post.date), "MMMM d, yyyy");
   const postUrl = `https://oyonews.com.ng/${post.slug}`;
-  const contentWithAds = injectAdsIntoContent(post.content.rendered);
 
   return (
     <article className="bg-white rounded-lg shadow-lg overflow-hidden">
       {/* Featured Image */}
       <div className="relative">
         <img
-  src={featuredImage}
-  alt="..."
-  loading="lazy"
-  className="w-full h-64 md:h-96 object-cover"
-/>
+          src={featuredImage}
+          alt="..."
+          loading="lazy"
+          className="w-full h-64 md:h-96 object-cover"
+        />
         <div className="absolute top-4 left-4">
           <Badge className="bg-red-600 text-white">{category}</Badge>
         </div>
@@ -118,20 +98,11 @@ const date = format(new Date(post.date), "MMMM d, yyyy");
           <ShareButtons title={post.title.rendered} url={postUrl} />
         </div>
 
-        {/* Main Content with Ads */}
-        <div className="space-y-6">
-          {contentWithAds.map((block, i) =>
-            block === "__AD_PLACEHOLDER__" ? (
-              <AdBanner key={`ad-${i}`} size="medium" position="mid-content" />
-            ) : (
-              <div
-                key={i}
-                className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: block }}
-              />
-            )
-          )}
-        </div>
+        {/* Main Content (ads removed) */}
+        <div
+          className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: post.content.rendered }}
+        />
 
         {/* Tags */}
         <div className="mt-8 pt-6 border-t">
@@ -170,12 +141,12 @@ const date = format(new Date(post.date), "MMMM d, yyyy");
                 href={`/${rp.slug}`}
                 className="flex gap-4 p-4 rounded-lg hover:shadow-md transition-shadow"
               >
-                        <img
-  src={rp.image || "https://via.placeholder.com/80x80?text=No+Image"}
-  alt={rp.title || "Related post image"}
-  loading="lazy"
-  className="w-20 h-20 object-cover rounded"
-/>
+                <img
+                  src={rp.image || "https://via.placeholder.com/80x80?text=No+Image"}
+                  alt={rp.title || "Related post image"}
+                  loading="lazy"
+                  className="w-20 h-20 object-cover rounded"
+                />
                 <div>
                   <h4 className="font-semibold text-gray-800 line-clamp-2 mb-2">
                     {rp.title}

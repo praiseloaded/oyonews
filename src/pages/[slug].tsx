@@ -90,28 +90,20 @@ export default function SinglePostPage({ post, relatedPosts }: Props) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { slug } = context.params as { slug: string };
+  console.log("SSR slug:", slug);
+
+  const post = await fetchPostBySlug(slug);
+  console.log("post fetched?", !!post, post?.id);
+
+  if (!post) {
+    return { notFound: true };
+  }
 
   try {
-    const post = await fetchPostBySlug(slug);
-    if (!post) {
-      return { notFound: true };
-    }
-
     const relatedPosts = await fetchRelatedPosts(post);
-
-    return {
-      props: {
-        post,
-        relatedPosts,
-      },
-    };
+    return { props: { post, relatedPosts } };
   } catch (error) {
-    console.error("Error fetching post:", error);
-    return {
-      props: {
-        post: null,
-        relatedPosts: [],
-      },
-    };
+    console.error("Error fetching related posts:", error);
+    return { props: { post, relatedPosts: [] } };
   }
 };

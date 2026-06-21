@@ -33,32 +33,26 @@ const Header = () => {
 useEffect(() => {
   const fetchLogo = async () => {
     try {
-      const res = await fetch('https://api.oyonews.com.ng/wp-json', {
+      const res = await fetch('/api/site-info', {
         method: 'GET',
         cache: 'no-store',
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+      if (res.ok) {
+        const data = await res.json();
+        const icon = data?.site_icon_url || data?.site_logo || null;
+        if (icon) setLogoUrl(icon);
       }
-
-      const data = await res.json();
-
-      const icon =
-        data?.site_icon_url ||
-        data?.icon ||
-        null;
-
-      if (icon) setLogoUrl(icon);
+      // non-ok response: silently keep fallback logo, no throw needed
     } catch (error) {
-      console.error('Logo fetch failed:', error);
-      setLogoUrl('/logo-fallback.png');
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Logo fetch failed (non-critical):', error);
+      }
     }
   };
 
   fetchLogo();
 }, []);
-
 
   if (isLoading) {
     return (
@@ -76,12 +70,11 @@ useEffect(() => {
 
   return (
     <>
-    
-
-      {/* 🔴 Header Section */}
+      {/* Header Section */}
       <header className="bg-black text-white sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
+
             {/* Logo + Mobile Menu */}
             <div className="flex items-center">
               <Button
@@ -138,24 +131,7 @@ useEffect(() => {
               <Link href="/contact" className="text-white hover:text-red-400">
                 Contact
               </Link>
-              {isAuthenticated &&
-                (user?.role === "administrator" ? (
-                  <a
-                    href="https://api.oyonews.com.ng/wp-admin"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white hover:text-red-400"
-                  >
-                    Admin Panel
-                  </a>
-                ) : (
-                  <Link
-                    href="/dashboard"
-                    className="text-white hover:text-red-400"
-                  >
-                    Dashboard
-                  </Link>
-                ))}
+              
             </nav>
 
             {/* Auth Button / User */}
@@ -165,7 +141,7 @@ useEffect(() => {
                   <DropdownMenuTrigger asChild>
                     <Avatar className="cursor-pointer border-2 border-white hover:border-green-400">
                       <AvatarFallback className="bg-red-600 text-white uppercase">
-                        {getInitials(user?.name || user?.email || "U")}
+                        {getInitials(user?.name || user?.email || 'U')}
                       </AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>
@@ -175,24 +151,19 @@ useEffect(() => {
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => {
-                        if (user?.role === "administrator") {
-                          window.open(
-                            "https://api.oyonews.com.ng/wp-admin",
-                            "_blank"
-                          );
+                        if (user?.role === 'administrator') {
+                          window.open('https://api.oyonews.com.ng/wp-admin', '_blank');
                         } else {
-                          router.push("/dashboard");
+                          router.push('/dashboard');
                         }
                       }}
                     >
-                      {user?.role === "administrator"
-                        ? "Admin Panel"
-                        : "Dashboard"}
+                      {user?.role === 'administrator' ? 'Admin Panel' : 'Dashboard'}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => {
                         logout();
-                        router.push("/");
+                        router.push('/');
                       }}
                       className="text-red-600"
                     >
@@ -231,50 +202,31 @@ useEffect(() => {
           <div
             className={`md:hidden transition-all duration-300 ease-in-out ${
               isMobileMenuOpen
-                ? "max-h-64 opacity-100 border-t border-gray-700"
-                : "max-h-0 opacity-0 overflow-hidden"
+                ? 'max-h-64 opacity-100 border-t border-gray-700'
+                : 'max-h-0 opacity-0 overflow-hidden'
             }`}
           >
             <nav className="py-4 space-y-1">
-              {["/", "/search", "/about", "/contact"].map((path) => (
+              {['/', '/search', '/about', '/contact'].map((path) => (
                 <Link
                   key={path}
                   href={path}
                   onClick={closeMobileMenu}
                   className="block px-4 py-3 text-white hover:text-red-400 hover:bg-gray-800 transition rounded mx-2"
                 >
-                  {path === "/"
-                    ? "Home"
+                  {path === '/'
+                    ? 'Home'
                     : path.slice(1).charAt(0).toUpperCase() + path.slice(2)}
                 </Link>
               ))}
-              {isAuthenticated &&
-                (user?.role === "administrator" ? (
-                  <a
-                    href="https://api.oyonews.com.ng/wp-admin"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block px-4 py-3 text-white hover:text-red-400 hover:bg-gray-800 transition rounded mx-2"
-                    onClick={closeMobileMenu}
-                  >
-                    Admin Panel
-                  </a>
-                ) : (
-                  <Link
-                    href="/dashboard"
-                    onClick={closeMobileMenu}
-                    className="block px-4 py-3 text-white hover:text-red-400 hover:bg-gray-800 transition rounded mx-2"
-                  >
-                    Dashboard
-                  </Link>
-                ))}
+             
               <div className="px-4 py-2 mx-2 sm:hidden">
                 {isAuthenticated ? (
                   <Button
                     onClick={() => {
                       logout();
                       closeMobileMenu();
-                      router.push("/");
+                      router.push('/');
                     }}
                     variant="ghost"
                     size="sm"
@@ -296,6 +248,7 @@ useEffect(() => {
               </div>
             </nav>
           </div>
+
         </div>
       </header>
     </>

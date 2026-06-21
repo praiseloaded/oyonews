@@ -52,7 +52,7 @@ const MainNav = () => {
     const fetchCategories = async () => {
       try {
         const res = await fetch(
-          'https://api.oyonews.com.ng/wp-json/wp/v2/categories?per_page=100'
+          '/api/categories?per_page=100'
         );
         const data: Category[] = await res.json();
         const sorted = data
